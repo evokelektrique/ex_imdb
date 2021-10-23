@@ -2,7 +2,7 @@ defmodule ExImdb do
   @base_url "https://www.imdb.com/"
 
   def find(title) do
-    case HTTPoison.get(@base_url <> "find?q=batman&s=tt") do
+    case HTTPoison.get(@base_url <> "find?q=" <> title <> "&s=tt") do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         parse(:find, body)
 
@@ -42,6 +42,11 @@ defmodule ExImdb do
       |> String.split([" (", ")"], trim: true)
       |> Enum.at(1)
 
-    %{name: name, year: year}
+    photo =
+      tr
+      |> Floki.find(".primary_photo img")
+      |> Floki.attribute("src")
+
+    %{name: name, year: year, photo: photo}
   end
 end
